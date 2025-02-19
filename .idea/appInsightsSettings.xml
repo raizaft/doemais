@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="ifpb.edu.br.pdm.doemais" />
+                  <option name="mobileSdkAppId" value="1:530257295200:android:b369b4b47af22df24cd005" />
+                  <option name="projectId" value="doemais-ace9c" />
+                  <option name="projectNumber" value="530257295200" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
