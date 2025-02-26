@@ -1,6 +1,7 @@
 package ifpb.edu.br.pdm.doemais.model
 
 import com.google.firebase.firestore.DocumentId
+import java.io.Serializable
 
 data class Usuario (
     @DocumentId
@@ -12,4 +13,4 @@ data class Usuario (
     val peso: Double = 0.0,
     val altura: Int = 0,
     val idade: Int = 0
-)
+) : Serializable

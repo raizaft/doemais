@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import ifpb.edu.br.pdm.doemais.model.Usuario
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ifpb.edu.br.pdm.doemais.model.UsuarioDAO
@@ -26,7 +27,7 @@ import ifpb.edu.br.pdm.doemais.model.UsuarioDAO
 val usuarioDAO = UsuarioDAO()
 
 @Composable
-fun TelaLogin(modifier: Modifier = Modifier, navController: NavController, onSigninClick: () -> Unit) {
+fun TelaLogin(modifier: Modifier = Modifier, navController: NavController, onSigninClick: (Usuario) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -100,7 +101,9 @@ fun TelaLogin(modifier: Modifier = Modifier, navController: NavController, onSig
                 scope.launch(Dispatchers.IO) {
                     usuarioDAO.buscarPorEmail(email) { usuario ->
                         if (usuario != null && usuario.senha == senha) {
-                            onSigninClick()
+                            scope.launch(Dispatchers.Main) {
+                                navController.navigate("principal/$email")
+                            }
                         } else {
                             mensagemErro = "Email ou senha inválidos!"
                         }

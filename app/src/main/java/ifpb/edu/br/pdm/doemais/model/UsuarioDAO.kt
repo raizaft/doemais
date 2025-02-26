@@ -7,7 +7,7 @@ import com.google.firebase.firestore.toObjects
 class UsuarioDAO {
     val db = FirebaseFirestore.getInstance()
 
-    fun buscar(callback: (List<Usuario>) -> Unit) {
+    fun listarTodos(callback: (List<Usuario>) -> Unit) {
         db.collection("usuarios").get()
             .addOnSuccessListener { document ->
                 val usuarios = document.toObjects<Usuario>()
@@ -63,10 +63,30 @@ class UsuarioDAO {
             }
     }
 
-    fun adicionar(usuario: Usuario, callback: (Boolean) -> Unit) {
+    fun criar(usuario: Usuario, callback: (Boolean) -> Unit) {
         val usuarioRef = db.collection("usuarios").document()
         val usuarioComId = usuario.copy(id = usuarioRef.id)
         usuarioRef.set(usuarioComId)
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+
+    fun atualizar(id: String, novosDados: Usuario, callback: (Boolean) -> Unit) {
+        db.collection("usuarios").document(id).set(novosDados)
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+
+    fun deletar(id: String, callback: (Boolean) -> Unit) {
+        db.collection("usuarios").document(id).delete()
             .addOnSuccessListener {
                 callback(true)
             }

@@ -141,7 +141,7 @@ fun TelaCadastro(navController: NavController) {
                     )
 
                     scope.launch(Dispatchers.IO) {
-                        usuarioDAO.adicionar(usuario) { sucesso ->
+                        usuarioDAO.criar(usuario) { sucesso ->
                             if (sucesso) {
                                 navController.navigate("login")
                             } else {

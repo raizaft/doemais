@@ -18,8 +18,10 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaCadastro
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaLogin
+import ifpb.edu.br.pdm.doemais.ui.telas.TelaPerfil
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaPrincipal
 import ifpb.edu.br.pdm.doemais.ui.theme.DoemaisTheme
+import ifpb.edu.br.pdm.doemais.viewmodel.UsuarioViewModel
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -28,12 +30,10 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
             DoemaisTheme {
-                val navController = rememberNavController()
-
                 Scaffold(
                     modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "login") {
                         composable("login") {
                             TelaLogin(modifier = Modifier.padding(innerPadding), navController = navController, onSigninClick = {
@@ -43,13 +43,15 @@ class MainActivity : ComponentActivity() {
                         composable("cadastro") {
                             TelaCadastro(navController = navController)
                         }
-                        composable("principal") {
-                            TelaPrincipal(modifier = Modifier.padding(innerPadding), onLogoffClick = {
-                                navController.navigate("login")
-                            })
+                        composable("principal/{email}") { backStackEntry ->
+                            val email = backStackEntry.arguments?.getString("email") ?: ""
+                            TelaPrincipal(navController = navController, email = email)
+                        }
+                        composable("perfil/{email}") { backStackEntry ->
+                            val email = backStackEntry.arguments?.getString("email") ?: ""
+                            TelaPerfil(navController = navController, email = email)
                         }
                     }
-
                 }
             }
         }
