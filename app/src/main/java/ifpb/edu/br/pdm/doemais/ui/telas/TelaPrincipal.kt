@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import ifpb.edu.br.pdm.doemais.model.BancoDAO
 import ifpb.edu.br.pdm.doemais.model.Banco
 import ifpb.edu.br.pdm.doemais.viewmodel.UsuarioViewModel
@@ -51,17 +52,19 @@ fun TelaPrincipal(navController: NavController, email :String) {
 
 @Composable
 fun BottomNavigationBar(navController: NavController, email: String) {
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
     NavigationBar {
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home", tint = Color(0xFF8B0000)) },
             label = { Text("Home", color = Color(0xFF8B0000)) },
-            selected = true,
+            selected = currentRoute == "principal/$email",
             onClick = { navController.navigate("principal/$email") }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil", tint = Color(0xFF8B0000)) },
             label = { Text("Perfil", color = Color(0xFF8B0000)) },
-            selected = false,
+            selected = currentRoute == "perfil/$email",
             onClick = { navController.navigate("perfil/$email") }
         )
     }
