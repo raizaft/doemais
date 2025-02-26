@@ -1,6 +1,7 @@
 package ifpb.edu.br.pdm.doemais.ui.telas
 
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -172,6 +173,33 @@ fun PerfilContent(usuarioInicial: Usuario, scope: CoroutineScope, context: andro
                     if (editMode) "Salvar Alterações" else "Editar Informações",
                     color = Color.White
                 )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    scope.launch(Dispatchers.IO) {
+                        usuarioDAO.deletar(usuario!!.id) { sucesso ->
+                            scope.launch(Dispatchers.Main) {
+                                if (sucesso) {
+                                    navController.navigate("login") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                    Toast.makeText(context, "Conta excluída com sucesso", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Erro ao excluir conta", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(25.dp),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF8B0000))
+            ) {
+                Text("Excluir Conta", color = Color(0xFF8B0000))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
