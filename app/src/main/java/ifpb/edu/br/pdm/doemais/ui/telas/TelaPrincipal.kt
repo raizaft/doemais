@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,8 @@ import ifpb.edu.br.pdm.doemais.model.BancoDAO
 import ifpb.edu.br.pdm.doemais.model.Banco
 import ifpb.edu.br.pdm.doemais.model.UsuarioDAO
 import ifpb.edu.br.pdm.doemais.viewmodel.UsuarioViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +69,7 @@ fun TelaPrincipal(navController: NavController, email :String) {
                 )
                 LazyColumn {
                     items(bancosProximos) { banco ->
-                        BancoCard(banco)
+                        BancoCard(banco, email, navController)
                     }
                 }
             }
@@ -81,7 +84,7 @@ fun TelaPrincipal(navController: NavController, email :String) {
                 )
                 LazyColumn {
                     items(outrosBancos) { banco ->
-                        BancoCard(banco)
+                        BancoCard(banco, email, navController)
                     }
                 }
             }
@@ -108,15 +111,21 @@ fun BottomNavigationBar(navController: NavController, email: String) {
         )
         NavigationBarItem(
             icon = { Icon(Icons.Filled.DateRange, contentDescription = "Agendamentos", tint = Color(0xFF8B0000)) },
-            label = { Text("Agendamentos", color = Color(0xFF8B0000)) },
+            label = { Text("Histórico", color = Color(0xFF8B0000)) },
             selected = currentRoute == "agendamentos/$email",
             onClick = { navController.navigate("agendamentos/$email") }
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.LocationOn, contentDescription = "Locais", tint = Color(0xFF8B0000)) },
+            label = { Text("Locais", color = Color(0xFF8B0000)) },
+            selected = currentRoute == "hospitais/$email",
+            onClick = { navController.navigate("hospitais/$email") }
         )
     }
 }
 
 @Composable
-fun BancoCard(banco: Banco) {
+fun BancoCard(banco: Banco, email: String, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,6 +147,18 @@ fun BancoCard(banco: Banco) {
                 text = "Cidade: ${banco.cidade}",
                 style = MaterialTheme.typography.bodyMedium
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate("agendar/${banco.id}/$email")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000))
+            ) {
+                Text("Agendar horário", color = Color.White)
+            }
         }
     }
 }

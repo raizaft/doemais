@@ -80,31 +80,35 @@ fun AgendamentoCard(agendamento: Agendamento, navController: NavController) {
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            val context = LocalContext.current
-            Button(
-                onClick = {
-                    val agendamentoDAO = AgendamentoDAO()
-                    agendamentoDAO.cancelarAgendamento(agendamento) { success ->
-                        if (success) {
-                            Toast.makeText(
-                                context,
-                                "Agendamento cancelado com sucesso",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Erro ao cancelar agendamento",
-                                Toast.LENGTH_SHORT
-                            ).show()
+
+            if (agendamento.status == "Agendado") {
+                val context = LocalContext.current
+                Button(
+                    onClick = {
+                        val agendamentoDAO = AgendamentoDAO()
+                        agendamentoDAO.cancelarAgendamento(agendamento) { success ->
+                            if (success) {
+                                Toast.makeText(
+                                    context,
+                                    "Agendamento cancelado com sucesso",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Erro ao cancelar agendamento",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000))
-            ) {
-                Text("Cancelar Agendamento", color = Color.White)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000))
+                ) {
+                    Text("Cancelar Agendamento", color = Color.White)
+                }
             }
+
         }
     }
 }

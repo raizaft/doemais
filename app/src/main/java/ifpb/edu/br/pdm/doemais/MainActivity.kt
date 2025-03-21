@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaCadastro
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaAgendar
+import ifpb.edu.br.pdm.doemais.ui.telas.TelaHospitais
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaLogin
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaMeusAgendamentos
 import ifpb.edu.br.pdm.doemais.ui.telas.TelaPerfil
@@ -59,6 +60,10 @@ class MainActivity : ComponentActivity() {
                         composable("agendamentos/{email}") { backStackEntry ->
                             val email = backStackEntry.arguments?.getString("email") ?: ""
                             TelaMeusAgendamentos(email = email, navController = navController)
+                        }
+                        composable("hospitais/{email}") { backStackEntry ->
+                            val email = backStackEntry.arguments?.getString("email") ?: ""
+                            TelaHospitais(email = email, navController = navController)
                         }
                     }
                 }

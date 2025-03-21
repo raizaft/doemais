@@ -127,6 +127,7 @@ fun TelaAgendar(bancoId: String, email: String, navController: NavController) {
                                         if (saved) {
                                             isAgendamentoConcluido = true
                                             Toast.makeText(navController.context, "Agendamento confirmado e salvo!", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("principal/$email")
                                         } else {
                                             Toast.makeText(navController.context, "Erro ao salvar o agendamento.", Toast.LENGTH_SHORT).show()
                                         }

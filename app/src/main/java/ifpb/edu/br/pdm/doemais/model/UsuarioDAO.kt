@@ -10,9 +10,13 @@ class UsuarioDAO {
     private val usuariosRef = db.collection("usuarios")
 
     fun criar(usuario: Usuario, callback: (Boolean) -> Unit) {
-        usuariosRef.document(usuario.id).set(usuario)
-            .addOnSuccessListener { callback(true) }
-            .addOnFailureListener { callback(false) }
+        val novoUsuarioRef = usuariosRef.add(usuario)
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
     }
 
     fun buscarPorEmail(email: String, callback: (Usuario?) -> Unit) {
