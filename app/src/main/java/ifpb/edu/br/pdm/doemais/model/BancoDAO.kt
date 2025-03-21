@@ -124,6 +124,17 @@ class BancoDAO {
             }
     }
 
+    fun buscarPorId(id: String, callback: (Banco?) -> Unit) {
+        bancosRef.document(id).get()
+            .addOnSuccessListener { document ->
+                val banco = document.toObject(Banco::class.java)
+                callback(banco)
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+
     @SuppressLint("SimpleDateFormat")
     private fun gerarHorarios(abertura: String, fechamento: String): List<String> {
         val horarios = mutableListOf<String>()

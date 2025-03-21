@@ -18,15 +18,32 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ifpb.edu.br.pdm.doemais.model.BancoDAO
 import ifpb.edu.br.pdm.doemais.model.Banco
+import ifpb.edu.br.pdm.doemais.model.UsuarioDAO
 import ifpb.edu.br.pdm.doemais.viewmodel.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaPrincipal(navController: NavController, email :String) {
-    var bancos by remember { mutableStateOf<List<Banco>>(emptyList()) }
+    var bancosProximos by remember { mutableStateOf<List<Banco>>(emptyList()) }
+    var outrosBancos by remember { mutableStateOf<List<Banco>>(emptyList()) }
+    var cidadeUsuario by remember { mutableStateOf<String>("") }
 
     LaunchedEffect(Unit) {
-        BancoDAO().listarTodos { bancos = it }
+        UsuarioDAO().getId(email) { usuarioId ->
+            if (usuarioId != null) {
+                UsuarioDAO().getUsuarioCidade(usuarioId) { cidade ->
+                    cidadeUsuario = cidade ?: ""
+
+                    BancoDAO().buscarPorCidade(cidadeUsuario) { bancosProximosList ->
+                        bancosProximos = bancosProximosList
+
+                        BancoDAO().listarTodos { todosBancos ->
+                            outrosBancos = todosBancos.filterNot { it.cidade == cidadeUsuario }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -39,12 +56,33 @@ fun TelaPrincipal(navController: NavController, email :String) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(16.dp)
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(bancos) { banco ->
-                    BancoCard(banco, email, navController)
+            if (bancosProximos.isNotEmpty()) {
+                Text(
+                    text = "Próximos a Você",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                LazyColumn {
+                    items(bancosProximos) { banco ->
+                        BancoCard(banco)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (outrosBancos.isNotEmpty()) {
+                Text(
+                    text = "Outros",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                LazyColumn {
+                    items(outrosBancos) { banco ->
+                        BancoCard(banco)
+                    }
                 }
             }
         }
@@ -78,7 +116,7 @@ fun BottomNavigationBar(navController: NavController, email: String) {
 }
 
 @Composable
-fun BancoCard(banco: Banco, email: String, navController: NavController) {
+fun BancoCard(banco: Banco) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,20 +131,13 @@ fun BancoCard(banco: Banco, email: String, navController: NavController) {
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = banco.endereco,
+                text = "Endereço: ${banco.endereco}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    navController.navigate("agendar/${banco.id}/$email")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000))
-            ) {
-                Text("Agendar horário", color = Color.White)
-            }
+            Text(
+                text = "Cidade: ${banco.cidade}",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

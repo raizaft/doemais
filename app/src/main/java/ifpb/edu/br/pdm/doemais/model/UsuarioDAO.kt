@@ -29,6 +29,22 @@ class UsuarioDAO {
             .addOnFailureListener { callback(null) }
     }
 
+    fun getUsuarioCidade(usuarioId: String, callback: (String?) -> Unit) {
+        usuariosRef.document(usuarioId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val cidade = document.getString("cidade")
+                    callback(cidade)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirestoreError", "Erro ao buscar cidade do usuário: ${exception.message}")
+                callback(null)
+            }
+    }
+
     fun getId(email: String, callback: (String?) -> Unit) {
         usuariosRef.whereEqualTo("email", email).get()
             .addOnSuccessListener { result ->
