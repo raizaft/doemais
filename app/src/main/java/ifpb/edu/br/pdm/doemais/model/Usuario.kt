@@ -12,5 +12,6 @@ data class Usuario (
     val cep: String = "",
     val peso: Double = 0.0,
     val altura: Int = 0,
-    val idade: Int = 0
+    val idade: Int = 0,
+    val cidade: String = ""
 ) : Serializable

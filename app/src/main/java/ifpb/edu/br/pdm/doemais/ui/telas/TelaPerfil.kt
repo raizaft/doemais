@@ -1,12 +1,8 @@
 package ifpb.edu.br.pdm.doemais.ui.telas
 
 import android.widget.Toast
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ifpb.edu.br.pdm.doemais.model.Usuario
 import ifpb.edu.br.pdm.doemais.model.UsuarioDAO
-import ifpb.edu.br.pdm.doemais.viewmodel.UsuarioViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,6 +60,7 @@ fun PerfilContent(usuarioInicial: Usuario, scope: CoroutineScope, context: andro
     var email by remember { mutableStateOf(usuario.email) }
     var senha by remember { mutableStateOf(usuario.senha) }
     var cep by remember { mutableStateOf(usuario.cep) }
+    var cidade by remember { mutableStateOf(usuario.cidade) }
     var idade by remember { mutableStateOf(usuario.idade.toString()) }
     var altura by remember { mutableStateOf(usuario.altura.toString()) }
     var peso by remember { mutableStateOf(usuario.peso.toString()) }
@@ -107,6 +103,10 @@ fun PerfilContent(usuarioInicial: Usuario, scope: CoroutineScope, context: andro
                             onValueChange = { cep = it },
                             label = { Text("CEP") })
                         OutlinedTextField(
+                            value = cidade,
+                            onValueChange = { cidade = it },
+                            label = { Text("Cidade") })
+                        OutlinedTextField(
                             value = idade,
                             onValueChange = { idade = it },
                             label = { Text("Idade") })
@@ -121,99 +121,112 @@ fun PerfilContent(usuarioInicial: Usuario, scope: CoroutineScope, context: andro
                     } else {
                         PerfilInfo(label = "Nome", value = nome)
                         PerfilInfo(label = "Email", value = email)
+                        PerfilInfo(label = "Cidade", value = cidade)
                         PerfilInfo(label = "CEP", value = cep)
                         PerfilInfo(label = "Idade", value = idade)
                         PerfilInfo(label = "Altura", value = altura)
                         PerfilInfo(label = "Peso", value = peso)
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    if (editMode) {
-                        val usuarioAtualizado = usuario.copy(
-                            nome = nome, email = email, senha = senha, cep = cep,
-                            idade = idade.toIntOrNull() ?: usuario.idade,
-                            altura = altura.toIntOrNull() ?: usuario.altura,
-                            peso = peso.toDoubleOrNull() ?: usuario.peso
-                        )
+                Button(
+                    onClick = {
+                        if (editMode) {
+                            val usuarioAtualizado = usuario.copy(
+                                nome = nome,
+                                email = email,
+                                senha = senha,
+                                cidade = cidade,
+                                cep = cep,
+                                idade = idade.toIntOrNull() ?: usuario.idade,
+                                altura = altura.toIntOrNull() ?: usuario.altura,
+                                peso = peso.toDoubleOrNull() ?: usuario.peso
+                            )
 
+                            scope.launch(Dispatchers.IO) {
+                                usuarioDAO.atualizar(usuario.id, usuarioAtualizado) { sucesso ->
+                                    scope.launch(Dispatchers.Main) {
+                                        if (sucesso) {
+                                            usuario = usuarioAtualizado
+                                            editMode = false
+                                            Toast.makeText(
+                                                context,
+                                                "Dados atualizados!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Erro ao atualizar",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            editMode = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000))
+                ) {
+                    Text(
+                        if (editMode) "Salvar Alterações" else "Editar Informações",
+                        color = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
                         scope.launch(Dispatchers.IO) {
-                            usuarioDAO.atualizar(usuario.id, usuarioAtualizado) { sucesso ->
+                            usuarioDAO.deletar(usuario!!.id) { sucesso ->
                                 scope.launch(Dispatchers.Main) {
                                     if (sucesso) {
-                                        usuario = usuarioAtualizado
-                                        editMode = false
+                                        navController.navigate("login") {
+                                            popUpTo("login") { inclusive = true }
+                                        }
                                         Toast.makeText(
                                             context,
-                                            "Dados atualizados!",
+                                            "Conta excluída com sucesso.",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "Erro ao atualizar",
+                                            "Erro ao excluir conta.",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
                                 }
                             }
                         }
-                    } else {
-                        editMode = true
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000))
-            ) {
-                Text(
-                    if (editMode) "Salvar Alterações" else "Editar Informações",
-                    color = Color.White
-                )
-            }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(25.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+                    border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF8B0000))
+                ) {
+                    Text("Excluir Conta", color = Color(0xFF8B0000))
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    scope.launch(Dispatchers.IO) {
-                        usuarioDAO.deletar(usuario!!.id) { sucesso ->
-                            scope.launch(Dispatchers.Main) {
-                                if (sucesso) {
-                                    navController.navigate("login") {
-                                        popUpTo("login") { inclusive = true }
-                                    }
-                                    Toast.makeText(context, "Conta excluída com sucesso", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(context, "Erro ao excluir conta", Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                Button(
+                    onClick = {
+                        navController.navigate("login") {
+                            popUpTo("login") { inclusive = true }
                         }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(25.dp),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
-                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF8B0000))
-            ) {
-                Text("Excluir Conta", color = Color(0xFF8B0000))
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    navController.navigate("login") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-            ) {
-                Text("Sair", color = Color.White)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                ) {
+                    Text("Sair", color = Color.White)
+                }
             }
         }
     }

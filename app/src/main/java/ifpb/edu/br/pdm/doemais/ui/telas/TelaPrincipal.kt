@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -43,7 +44,7 @@ fun TelaPrincipal(navController: NavController, email :String) {
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(bancos) { banco ->
-                    BancoCard(banco)
+                    BancoCard(banco, email, navController)
                 }
             }
         }
@@ -67,11 +68,17 @@ fun BottomNavigationBar(navController: NavController, email: String) {
             selected = currentRoute == "perfil/$email",
             onClick = { navController.navigate("perfil/$email") }
         )
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.DateRange, contentDescription = "Agendamentos", tint = Color(0xFF8B0000)) },
+            label = { Text("Agendamentos", color = Color(0xFF8B0000)) },
+            selected = currentRoute == "agendamentos/$email",
+            onClick = { navController.navigate("agendamentos/$email") }
+        )
     }
 }
 
 @Composable
-fun BancoCard(banco: Banco) {
+fun BancoCard(banco: Banco, email: String, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -89,11 +96,17 @@ fun BancoCard(banco: Banco) {
                 text = banco.endereco,
                 style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = "Horário de funcionamento: ${banco.horario}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate("agendar/${banco.id}/$email")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000))
+            ) {
+                Text("Agendar horário", color = Color.White)
+            }
         }
     }
 }

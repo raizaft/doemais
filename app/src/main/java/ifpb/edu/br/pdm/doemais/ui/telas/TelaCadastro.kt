@@ -32,6 +32,7 @@ fun TelaCadastro(navController: NavController) {
     var peso by remember { mutableStateOf("") }
     var altura by remember { mutableStateOf("") }
     var idade by remember { mutableStateOf("") }
+    var cidade by remember { mutableStateOf("") }
     var mensagemErro by remember { mutableStateOf<String?>(null) }
 
     Column(
@@ -126,9 +127,18 @@ fun TelaCadastro(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        OutlinedTextField(
+            value = cidade,
+            onValueChange = { cidade = it },
+            label = { Text("Cidade") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
-                if (nome.isNotBlank() && email.isNotBlank() && senha.isNotBlank()) {
+                if (nome.isNotBlank() && email.isNotBlank() && senha.isNotBlank() && cidade.isNotBlank()) {
                     val usuario = Usuario(
                         id = "",
                         nome = nome,
@@ -137,7 +147,8 @@ fun TelaCadastro(navController: NavController) {
                         cep = cep,
                         peso = peso.toDoubleOrNull() ?: 0.0,
                         altura = altura.toIntOrNull() ?: 0,
-                        idade = idade.toIntOrNull() ?: 0
+                        idade = idade.toIntOrNull() ?: 0,
+                        cidade = cidade
                     )
 
                     scope.launch(Dispatchers.IO) {
